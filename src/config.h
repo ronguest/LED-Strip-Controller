@@ -20,7 +20,7 @@ long one, two, three, four;   // used to read a long from EEPROM
 
 long color;
 long previousColor;               // Stores the previous color, used when we toggle from off to on
-enum modes { manual = 0, lightShow = 1, theaterRainbow = 2, rainbowMode = 3 };
+enum modes { manual = 0, dance = 1, theaterRainbow = 2, rainbowMode = 3 };
 modes myMode = manual;
 //boolean ledOn = true;
 
@@ -64,6 +64,7 @@ void turnOff();
 void theaterChaseRainbow(uint8_t);
 void rainbowCycle(uint8_t);
 void rainbow(uint8_t);
+void danceMode(uint8_t);
 void handleOnOffMessage(AdafruitIO_Data*);
 void handleModeMessage(AdafruitIO_Data*);
 void handleColorMessage(AdafruitIO_Data*);

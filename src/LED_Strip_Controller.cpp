@@ -136,8 +136,8 @@ void loop() {
     pushColor(color);
     pixels.show();
   } else*/
-  if (switchOn && (myMode == lightShow)) {
-    rainbowCycle(20);
+  if (switchOn && (myMode == dance)) {
+    danceMode(100);
   } else if (switchOn && (myMode == theaterRainbow)) {
     theaterChaseRainbow(50);
   } else if (switchOn && (myMode == rainbowMode)) {
@@ -215,6 +215,19 @@ void rainbow(uint8_t wait) {
   }
 }
 
+void danceMode(uint8_t wait) {
+  uint16_t i, j;
+
+  //for(j=0; j<256; j++) {
+  for(j=0; j<256; j+=17) {
+    for(i=0; i<pixels.numPixels(); i++) {
+      pixels.setPixelColor(i, Wheel((i+j) & 255));
+    }
+    pixels.show();
+    delay(wait);
+    if (switchOn == false) return;
+  }
+}
 // np_on_off - Turn LED strip on and off, off
 void handleOnOffMessage(AdafruitIO_Data *data) {
   Serial.print("On/Off recevied: ");
@@ -257,8 +270,8 @@ void handleModeMessage(AdafruitIO_Data *data) {
       pixels.show();
       break;
     case 1:
-      myMode = lightShow;
-      message += "light show/rainbowCycle";
+      myMode = dance;
+      message += "dance mode";
       break;
     case 2:
       myMode = theaterRainbow;
