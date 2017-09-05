@@ -20,7 +20,7 @@ long one, two, three, four;   // used to read a long from EEPROM
 
 long color;
 long previousColor;               // Stores the previous color, used when we toggle from off to on
-enum modes { manual = 0, lightShow = 1, theaterRainbow = 2, invalid = 3 };
+enum modes { manual = 0, lightShow = 1, theaterRainbow = 2, rainbowMode = 3 };
 modes myMode = manual;
 //boolean ledOn = true;
 

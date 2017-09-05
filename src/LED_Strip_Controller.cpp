@@ -140,7 +140,9 @@ void loop() {
     rainbowCycle(20);
   } else if (switchOn && (myMode == theaterRainbow)) {
     theaterChaseRainbow(50);
-  } // For Manual mode (0) nothing to be done
+  } else if (switchOn && (myMode == rainbowMode)) {
+    rainbow(50);
+  }// For Manual mode (0) nothing to be done
 }
 
 // Input a value 0 to 255 to get a color value.
@@ -256,14 +258,18 @@ void handleModeMessage(AdafruitIO_Data *data) {
       break;
     case 1:
       myMode = lightShow;
-      message += "light show";
+      message += "light show/rainbowCycle";
       break;
     case 2:
       myMode = theaterRainbow;
       message += "theater rainbow";
       break;
+    case 3:
+      myMode = rainbowMode;
+      message += "rainbow mode";
+      break;
     default:
-      myMode = invalid;
+      //myMode = invalid;
       message = "Received invalid mode";
       break;
   }
