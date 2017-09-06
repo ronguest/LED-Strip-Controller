@@ -22,6 +22,7 @@ void setup() {
   Serial.begin(115200);
   //while(! Serial);            // wait for serial monitor to open
   EEPROM.begin(eepromSize);
+  randomSeed(analogRead(0));
 
   Serial.print("Connecting to Adafruit IO");
   io.connect();
@@ -137,7 +138,7 @@ void loop() {
     pixels.show();
   } else*/
   if (switchOn && (myMode == dance)) {
-    danceMode(100);
+    danceMode();
   } else if (switchOn && (myMode == theaterRainbow)) {
     theaterChaseRainbow(50);
   } else if (switchOn && (myMode == rainbowMode)) {
@@ -215,16 +216,19 @@ void rainbow(uint8_t wait) {
   }
 }
 
-void danceMode(uint8_t wait) {
+void danceMode() {
   uint16_t i, j;
 
   //for(j=0; j<256; j++) {
   for(j=0; j<256; j+=17) {
     for(i=0; i<pixels.numPixels(); i++) {
-      pixels.setPixelColor(i, Wheel((i+j) & 255));
+      //pixels.setPixelColor(i, Wheel((i+j) & 255));
+      pixels.setPixelColor(i, Wheel(random(1,255)));
     }
     pixels.show();
-    delay(wait);
+    Serial.print("Dance: pixel 16 color is: "); Serial.println(pixels.getPixelColor(16));
+    Serial.println("Dance: wait");
+    delay(1000);
     if (switchOn == false) return;
   }
 }

@@ -64,7 +64,7 @@ void turnOff();
 void theaterChaseRainbow(uint8_t);
 void rainbowCycle(uint8_t);
 void rainbow(uint8_t);
-void danceMode(uint8_t);
+void danceMode();
 void handleOnOffMessage(AdafruitIO_Data*);
 void handleModeMessage(AdafruitIO_Data*);
 void handleColorMessage(AdafruitIO_Data*);
