@@ -87,11 +87,6 @@ void loop() {
 
   time_t local = usCT.toLocal(now(), &tcr);
   hours = hour(local);
-//  minutes = minute(local);
-//  seconds = second(local);
-//  dayOfWeek = weekday(local);
-//  int displayValue = hours*100 + minutes;
-//  unsigned long currentMillis = millis();
 
   // Perform actions at certain times of the day (hours)
   // Only trigger checks when the hours changes from previousHour
@@ -230,16 +225,20 @@ void dance() {
   Serial.println("Dance mode");
   //for(j=0; j<256; j++) {
   for(j=0; j<256; j+=17) {
-    for(i=0; i<pixels.numPixels(); i++) {
+    for(i=0; i<pixels.numPixels()-3;i+=3) {
       //pixels.setPixelColor(i, Wheel((i+j) & 255));
-      pixels.setPixelColor(i, (pixels.getPixelColor(i) + Wheel(random(0,16777210))));
+      //pixels.setPixelColor(i, random(50,0xf0) << 16 | random(50,0xf0) << 8 | random(50,0xf0));
+      for (int k=i; k<i+3; k++) {
+        pixels.setPixelColor(k, random(1,0xffffff));
+      }
+      //pixels.setPixelColor(i, (pixels.getPixelColor(i) + Wheel(random(1,16777210))));
       //pixels.setPixelColor(i, (pixels.getPixelColor(i) + Wheel(random(0,255))));
       //pixels.setPixelColor(i, Wheel(random(1,255)));
     }
     pixels.show();
     Serial.print("Dance: pixel 16 color is: "); Serial.println(pixels.getPixelColor(16));
     //Serial.println("Dance: wait");
-    delay(2000);
+    delay(1000);
     if (switchOn == false) return;
   }
 }
@@ -275,38 +274,12 @@ void handleModeMessage(AdafruitIO_Data *data) {
   Serial.print("Received Mode: ");
   Serial.println(data->value());
 
-  //long myMode = int(data->value());
-  //long myMode = data->value();
-
   myMode = (uint8_t) atoi(data->value());
   message += myMode;
-/*  switch (atoi(data->value())) {
-    case manualMode:
-      myMode = manual;
-      message += "manual";
-      pushColor(color);
-      pixels.show();
-      break;
-    case danceMode:
-      myMode = dance;
-      message += "dance mode";
-      break;
-    case theaterRainbowMode:
-      myMode = theaterRainbow;
-      message += "theater rainbow";
-      break;
-    case rainbowMode:
-      myMode = rainbowMode;
-      message += "rainbow mode";
-      break;
-    default:
-      myMode = invalidMode;
-      message = "Received invalid mode";
-      break;
-  }*/
+
   Serial.print("Set mode to: ");Serial.println(myMode);
   statusFeed->save(message);
-  EEPROM.write(addrMode, 1);
+  EEPROM.write(addrMode, myMode);
   EEPROM.commit();
 }
 
