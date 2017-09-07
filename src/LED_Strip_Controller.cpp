@@ -70,6 +70,12 @@ void setup() {
   }
   Serial.print("Set switchOn from EEPROM: "); Serial.println(switchOn);
 
+  String s;
+  s = EEPROM.read(addrMode);
+  Serial.println("EEPROM says mode string is: " + s);
+  myMode = atoi(s.c_str());
+  Serial.print("Mode is: ");Serial.println(myMode);
+
   pushColor(color);
   pixels.show();
   statusFeed->save("Started");      // Log that we are ready to rock and roll
@@ -114,7 +120,9 @@ void loop() {
     if (hours == onTime) {
       Serial.print("onTime hours = "); Serial.println(hours);
       //color = previousColor;
-      color = 0xffef32e;
+      if (myMode == manualMode) {
+        color = 0xffef32e;
+      }
       //switchOn = true;
       statusFeed->save("Time to turn LEDs on");
       pushColor(color);
@@ -123,7 +131,7 @@ void loop() {
 
     // If it is (fake) sunset, change to a more orangne color
     // TODO: fetch actual sunset time for wunderground
-    if (hours == sunsetTime) {
+    if ((hours == sunsetTime) && (myMode == manualMode)) {
       color = 0x9c5c00;
       statusFeed->save("Switch to sunset color");
       pushColor(color);
@@ -137,9 +145,9 @@ void loop() {
     pushColor(color);
     pixels.show();
   } else*/
-  if (switchOn && (myMode == dance)) {
-    danceMode();
-  } else if (switchOn && (myMode == theaterRainbow)) {
+  if (switchOn && (myMode == danceMode)) {
+    dance();
+  } else if (switchOn && (myMode == theaterRainbowMode)) {
     theaterChaseRainbow(50);
   } else if (switchOn && (myMode == rainbowMode)) {
     rainbow(50);
@@ -216,22 +224,26 @@ void rainbow(uint8_t wait) {
   }
 }
 
-void danceMode() {
+void dance() {
   uint16_t i, j;
 
+  Serial.println("Dance mode");
   //for(j=0; j<256; j++) {
   for(j=0; j<256; j+=17) {
     for(i=0; i<pixels.numPixels(); i++) {
       //pixels.setPixelColor(i, Wheel((i+j) & 255));
-      pixels.setPixelColor(i, Wheel(random(1,255)));
+      pixels.setPixelColor(i, (pixels.getPixelColor(i) + Wheel(random(0,16777210))));
+      //pixels.setPixelColor(i, (pixels.getPixelColor(i) + Wheel(random(0,255))));
+      //pixels.setPixelColor(i, Wheel(random(1,255)));
     }
     pixels.show();
     Serial.print("Dance: pixel 16 color is: "); Serial.println(pixels.getPixelColor(16));
-    Serial.println("Dance: wait");
-    delay(1000);
+    //Serial.println("Dance: wait");
+    delay(2000);
     if (switchOn == false) return;
   }
 }
+
 // np_on_off - Turn LED strip on and off, off
 void handleOnOffMessage(AdafruitIO_Data *data) {
   Serial.print("On/Off recevied: ");
@@ -266,32 +278,36 @@ void handleModeMessage(AdafruitIO_Data *data) {
   //long myMode = int(data->value());
   //long myMode = data->value();
 
-  switch (atol(data->value())) {
-    case 0:
+  myMode = (uint8_t) atoi(data->value());
+  message += myMode;
+/*  switch (atoi(data->value())) {
+    case manualMode:
       myMode = manual;
       message += "manual";
       pushColor(color);
       pixels.show();
       break;
-    case 1:
+    case danceMode:
       myMode = dance;
       message += "dance mode";
       break;
-    case 2:
+    case theaterRainbowMode:
       myMode = theaterRainbow;
       message += "theater rainbow";
       break;
-    case 3:
+    case rainbowMode:
       myMode = rainbowMode;
       message += "rainbow mode";
       break;
     default:
-      //myMode = invalid;
+      myMode = invalidMode;
       message = "Received invalid mode";
       break;
-  }
+  }*/
   Serial.print("Set mode to: ");Serial.println(myMode);
   statusFeed->save(message);
+  EEPROM.write(addrMode, 1);
+  EEPROM.commit();
 }
 
 // this function is called whenever a 'color' message

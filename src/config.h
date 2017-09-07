@@ -16,12 +16,13 @@
 const int eepromSize = 128;
 unsigned int addrColor = 0;
 unsigned int addrSwitchOn = addrColor + sizeof(addrColor);
+unsigned int addrMode = addrSwitchOn + sizeof(addrSwitchOn);
 long one, two, three, four;   // used to read a long from EEPROM
 
 long color;
 long previousColor;               // Stores the previous color, used when we toggle from off to on
-enum modes { manual = 0, dance = 1, theaterRainbow = 2, rainbowMode = 3 };
-modes myMode = manual;
+uint8_t invalidMode = 0, manualMode = 1, danceMode = 2, theaterRainbowMode = 3, rainbowMode = 4;
+uint8_t myMode = manualMode;
 //boolean ledOn = true;
 
 //US Central Time Zone (Chicago, Houston)
@@ -64,7 +65,7 @@ void turnOff();
 void theaterChaseRainbow(uint8_t);
 void rainbowCycle(uint8_t);
 void rainbow(uint8_t);
-void danceMode();
+void dance();
 void handleOnOffMessage(AdafruitIO_Data*);
 void handleModeMessage(AdafruitIO_Data*);
 void handleColorMessage(AdafruitIO_Data*);
