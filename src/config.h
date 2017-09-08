@@ -34,6 +34,8 @@ TimeChangeRule usCST = {"CST", First, dowSunday, Nov, 2, -360};
 Timezone usCT(usCDT, usCST);
 TimeChangeRule *tcr;        //pointer to the time change rule, use to get the TZ abbrev
 time_t local;
+unsigned long lastUpdate = 0;
+const unsigned long updateCycle = 50000;
 
 ////// Code and variables for NTP syncing
 const int NTP_PACKET_SIZE = 48; // NTP time is in the first 48 bytes of message
@@ -64,7 +66,7 @@ uint32_t Wheel(byte);
 void turnOff();
 void theaterChaseRainbow(uint8_t);
 void rainbowCycle(uint8_t);
-void rainbow(uint8_t);
+void rainbow();
 void dance();
 void handleOnOffMessage(AdafruitIO_Data*);
 void handleModeMessage(AdafruitIO_Data*);

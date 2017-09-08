@@ -94,7 +94,6 @@ void loop() {
   // We also sync with NTP time once an hour
   if (hours != previousHour) {
     previousHour = hours;
-
     // Sync time at 5am every day, or if time failed set on boot
     if((hours == 5) || !timeIsSet) {
       // Try an NTP time sync so we don't stray too far
@@ -118,7 +117,6 @@ void loop() {
       if (myMode == manualMode) {
         color = 0xffef32e;
       }
-      //switchOn = true;
       statusFeed->save("Time to turn LEDs on");
       pushColor(color);
       pixels.show();
@@ -134,19 +132,42 @@ void loop() {
     }
   }
 
-  // if LED is not set to on the Color will be 0 and this will turn it off, will resume in correct mode once turned back on
-  /*if ((!switchOn)) {
-    //sendColor(color);
-    pushColor(color);
+  // Check if we should update LED strip
+  if ((millis() - lastUpdate) > updateCycle) {
+    rainbow();
+    lastUpdate = millis();
+  }
+}
+
+// Each call to rainbow runs through an update of each pixel
+uint16_t cycleColor = 0;
+void rainbow() {
+  for(uint16_t i=0; i<pixels.numPixels(); i++) {
+    pixels.setPixelColor(i, Wheel((i+cycleColor) & 255));
+  }
+  pixels.show();
+  cycleColor++;
+  if (cycleColor > 255) cycleColor = 0;
+}
+
+void dance() {
+  uint16_t i, j;
+
+  Serial.println("Slow dance mode");
+  //for(j=0; j<256; j++) {
+  for(j=0; j<256; j+=17) {
+    for(i=0; i<pixels.numPixels()-3;i+=3) {
+
+      for (int k=i; k<i+3; k++) {
+        pixels.setPixelColor(k, random(1,0xffffff));
+      }
+    }
     pixels.show();
-  } else*/
-  if (switchOn && (myMode == danceMode)) {
-    dance();
-  } else if (switchOn && (myMode == theaterRainbowMode)) {
-    theaterChaseRainbow(50);
-  } else if (switchOn && (myMode == rainbowMode)) {
-    rainbow(30000);
-  }// For Manual mode (0) nothing to be done
+    //Serial.print("Dance: pixel 16 color is: "); Serial.println(pixels.getPixelColor(16));
+    //Serial.println("Dance: wait");
+    delay(1000);
+    if (switchOn == false) return;
+  }
 }
 
 // Input a value 0 to 255 to get a color value.
@@ -168,7 +189,6 @@ uint32_t Wheel(byte WheelPos) {
 void turnOff() {
       previousColor = color;
       color = 0;
-      //switchOn = false;
       statusFeed->save("Turn LEDs off");
       pushColor(color);
       pixels.show();
@@ -202,43 +222,6 @@ void rainbowCycle(uint8_t wait) {
     }
     pixels.show();
     delay(wait);
-    if (switchOn == false) return;
-  }
-}
-
-void rainbow(uint8_t wait) {
-  uint16_t i, j;
-
-  for(j=0; j<256; j++) {
-    for(i=0; i<pixels.numPixels(); i++) {
-      pixels.setPixelColor(i, Wheel((i+j) & 255));
-    }
-    pixels.show();
-    delay(wait);
-    if (switchOn == false) return;
-  }
-}
-
-void dance() {
-  uint16_t i, j;
-
-  Serial.println("Dance mode");
-  //for(j=0; j<256; j++) {
-  for(j=0; j<256; j+=17) {
-    for(i=0; i<pixels.numPixels()-3;i+=3) {
-      //pixels.setPixelColor(i, Wheel((i+j) & 255));
-      //pixels.setPixelColor(i, random(50,0xf0) << 16 | random(50,0xf0) << 8 | random(50,0xf0));
-      for (int k=i; k<i+3; k++) {
-        pixels.setPixelColor(k, random(1,0xffffff));
-      }
-      //pixels.setPixelColor(i, (pixels.getPixelColor(i) + Wheel(random(1,16777210))));
-      //pixels.setPixelColor(i, (pixels.getPixelColor(i) + Wheel(random(0,255))));
-      //pixels.setPixelColor(i, Wheel(random(1,255)));
-    }
-    pixels.show();
-    Serial.print("Dance: pixel 16 color is: "); Serial.println(pixels.getPixelColor(16));
-    //Serial.println("Dance: wait");
-    delay(1000);
     if (switchOn == false) return;
   }
 }
