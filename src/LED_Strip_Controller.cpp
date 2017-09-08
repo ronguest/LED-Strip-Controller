@@ -145,7 +145,7 @@ void loop() {
   } else if (switchOn && (myMode == theaterRainbowMode)) {
     theaterChaseRainbow(50);
   } else if (switchOn && (myMode == rainbowMode)) {
-    rainbow(50);
+    rainbow(30000);
   }// For Manual mode (0) nothing to be done
 }
 
